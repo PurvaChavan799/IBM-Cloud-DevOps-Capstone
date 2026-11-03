@@ -40,4 +40,4 @@ spec:
         fi
 
         echo "Running unit tests using Nose..."
-        nosetests
+       python -c "import collections, collections.abc; collections.Callable = collections.abc.Callable; import nose; nose.main()"
