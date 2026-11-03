@@ -1,0 +1,43 @@
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cleanup
+spec:
+  workspaces:
+    - name: source
+  steps:
+    - name: cleanup
+      image: alpine:3.19
+      script: |
+        #!/bin/sh
+        echo "Starting cleanup task..."
+        rm -rf /workspace/source/.pytest_cache
+        rm -rf /workspace/source/.coverage
+        echo "Cleanup completed successfully."
+
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: nose
+spec:
+  workspaces:
+    - name: source
+  steps:
+    - name: run-unit-tests
+      image: python:3.11
+      workingDir: /workspace/source
+      script: |
+        #!/bin/sh
+        set -e
+        echo "Installing Nose testing framework..."
+        python -m pip install --upgrade pip
+        pip install nose
+
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+
+        echo "Running unit tests using Nose..."
+        nosetests
